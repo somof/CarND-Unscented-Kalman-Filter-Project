@@ -31,22 +31,39 @@ UKF::UKF() {
 ```
 
 ### Tuning Process Noise
-We have provided parameter values for measurement noise as well as process noise. The measurement noise values should not be changed; these are provided by the sensor manufacturer.
+We have provided parameter values for measurement noise as well as
+process noise. The measurement noise values should not be changed;
+these are provided by the sensor manufacturer.
 
-The values for the process noise std_a_ and std_yawdd_ are both set to 30. These will need to be adjusted in order to get your Kalman filter working. Think about what a standard deviation of 30 means. For a Gaussian distribution, we expect the acceleration to be between ...... ninety-five percent of the time .
+The values for the process noise std_a_ and std_yawdd_ are both set
+to 30. These will need to be adjusted in order to get your Kalman
+filter working. Think about what a standard deviation of 30 means. For
+a Gaussian distribution, we expect the acceleration to be between
+...... ninety-five percent of the time .
 
-That seems quite high! To put those values in perspective, the fastest measured linear acceleration for a street legal sports car is currently 0 to 60 mph in 2.2 seconds. 0 to 60 mph in 2.2 seconds is about ....
+That seems quite high! To put those values in perspective, the fastest
+measured linear acceleration for a street legal sports car is
+currently 0 to 60 mph in 2.2 seconds. 0 to 60 mph in 2.2 seconds is
+about ....
+
  The bike simulation probably tends to have even lower acceleration.
 
-Once your unscented Kalman filter is coded, you'll have to experiment with different process noise values to try and lower RMSE.
+Once your unscented Kalman filter is coded, you'll have to experiment
+with different process noise values to try and lower RMSE.
 
 ### Initializing Variables
-You will need to initialize other variables besides the ones given in the ukf.cpp template. We have defined all of the variables that you will need in ukf.h. You can look at ukf.h to see what those variables are called, but there is no need to modify ukf.h.
+You will need to initialize other variables besides the ones given in
+the ukf.cpp template. We have defined all of the variables that you
+will need in ukf.h. You can look at ukf.h to see what those variables
+are called, but there is no need to modify ukf.h.
 
-Pay special attention to how you initialize x and P. For more information go back to the unscented Kalman filter lectures notes titled "What to Expect from the Project".
+Pay special attention to how you initialize x and P. For more
+information go back to the unscented Kalman filter lectures notes
+titled "What to Expect from the Project".
 
 ### Prediction and Update
-The rest of the code template contains functions for running the prediction and update steps:
+The rest of the code template contains functions for running the
+prediction and update steps:
 
 ```
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
