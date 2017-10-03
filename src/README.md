@@ -1,4 +1,36 @@
 
+
+計算は、決して少なくない
+課題は計算時間
+
+UKFは1995年頃に提案された
+
+
+不安定になりがちなETKの置き換え
+Unscentedは
+UKFの提案者であるJulierの研究所で募集して決めた名前
+「手垢のついていない、まったく新しい発想に基づく手法」という意味を込めている
+
+
+U変換（Unscented Transformation)
+できるだけ少ないサンプル点を用いて，変換後の確率変数のを推定することを考える
+線形近似を使うと変化してしまうので、そもそもの平均と分散からサンプル点をつくるモンテカルロ法の応用
+従って、統計的性質は変化しない
+
+λについて
+λ=3 - 次元数 の根拠は？
+論文 Julier and Uhlmann, 1997
+
+κ provides an extra degree of freedom to “fine tune” the higher
+order moments of the approximation, and can be used to reduce the
+overall prediction errors. When x (k) is assumed Gaussian, a useful
+heuristic is to select n + κ = 3. If a different distribution is
+assumed for x (k) then a different choice of κ might be more
+appropriate.
+
+λ=N(α^2 - 1), α:spread of sigma points の論文がある
+
+
 # The only files you need to modify are ukf.cpp and tools.cpp.
 
 - main.cpp - reads in data, calls a function to run the Unscented
