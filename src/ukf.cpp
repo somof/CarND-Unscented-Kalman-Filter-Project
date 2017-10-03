@@ -52,13 +52,33 @@ UKF::UKF() {
   Hint: one or more values initialized above might be wildly off...
   */
 
-  bool is_initialized_; // initially set to false, set to true in first call of ProcessMeasurement
-  MatrixXd Xsig_pred_; // predicted sigma points matrix
+  bool is_initialized_ = false; // initially set to false, set to true in first call of ProcessMeasurement
   long long time_us_; // time when the state is true, in us
-  VectorXd weights_; // Weights of sigma points
-  int n_x_; // State dimension
-  int n_aug_; // Augmented state dimension
-  double lambda_; // Sigma point spreading parameter
+
+  int n_x_ = 5; // State dimension
+  int n_aug_ = 7; // Augmented state dimension
+  double lambda_ = 3 - n_aug_; // Sigma point spreading parameter
+
+
+
+  // Trial Code
+  MatrixXd Xsig_pred = MatrixXd(n_x_, 2 * n_aug_ + 1); // predicted sigma points matrix
+  Xsig_pred <<
+         5.9374,  6.0640,   5.925,  5.9436,  5.9266,  5.9374,  5.9389,  5.9374,  5.8106,  5.9457,  5.9310,  5.9465,  5.9374,  5.9359,  5.93744,
+           1.48,  1.4436,   1.660,  1.4934,  1.5036,    1.48,  1.4868,    1.48,  1.5271,  1.3104,  1.4787,  1.4674,    1.48,  1.4851,    1.486,
+          2.204,  2.2841,  2.2455,  2.2958,   2.204,   2.204,  2.2395,   2.204,  2.1256,  2.1642,  2.1139,   2.204,   2.204,  2.1702,   2.2049,
+         0.5367, 0.47338, 0.67809, 0.55455, 0.64364, 0.54337,  0.5367, 0.53851, 0.60017, 0.39546, 0.51900, 0.42991, 0.530188,  0.5367, 0.535048,
+          0.352, 0.29997, 0.46212, 0.37633,  0.4841, 0.41872,   0.352, 0.38744, 0.40562, 0.24347, 0.32926,  0.2214, 0.28687,   0.352, 0.318159;
+
+
+  // Trial Code
+  VectorXd weights_ = VectorXd(2 * n_aug_ + 1); // Weights of sigma points
+  double weight_0 = lambda_ / (lambda_ + n_aug_);
+  weights_(0) = weight_0;
+  for (int i=1; i < 2 * n_aug_ + 1; i++) {  // 2n+1 weights
+     double weight = 0.5 / (n_aug_ + lambda_);
+     weights_(i) = weight;
+  }
 
 }
 

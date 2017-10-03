@@ -1,7 +1,7 @@
 #include <iostream>
 #include "L23_ukf.h"
 
-// :23. Predicted Mean and Covariance Assignment
+// L23. Predicted Mean and Covariance Assignment
 
 UKF::UKF() {
   //TODO Auto-generated constructor stub

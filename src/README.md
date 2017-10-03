@@ -8,6 +8,16 @@
             functions
 - tools.cpp- function to calculate RMSE
 
+# Lesson Codes
+
+## L15. Generating Sigma Points Assignment
+## L18. Sigma Points Augmentation Assignment
+## L21. Sigma Point Prediction Assignment 
+## L23. Predicted Mean and Covariance Assignment
+## L27. Predict Radar Measurement Assignment
+## L30. UKF Update Assignment 
+
+
 # Project codes
 
 The project has two files that you will need to modify: ukf.cpp and tools.cpp
