@@ -53,7 +53,7 @@ UKF::UKF() {
   */
 
   bool is_initialized_ = false; // initially set to false, set to true in first call of ProcessMeasurement
-  long long time_us_; // time when the state is true, in us
+  long long time_us_ = 0; // time when the state is true, in us
 
   int n_x_ = 5; // State dimension
   int n_aug_ = 7; // Augmented state dimension
@@ -89,12 +89,80 @@ UKF::~UKF() {}
  * either radar or laser.
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
-  /**
-  TODO:
+   /**
+      TODO:
 
-  Complete this function! Make sure you switch between lidar and radar
-  measurements.
-  */
+      Complete this function! Make sure you switch between lidar and radar
+      measurements.
+   */
+   if (!is_initialized_) {
+
+      x_ = VectorXd(4);
+
+      if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
+	 /**
+	    Convert radar from polar to cartesian coordinates and initialize state.
+	 */
+
+	 float rho = meas_package.raw_measurements_[0];
+	 float phi = meas_package.raw_measurements_[1];
+	 float rho_dot = meas_package.raw_measurements_[2];
+
+	 float px = rho * cos(phi);
+	 float py = rho * sin(phi);
+	 float vx = rho_dot * cos(phi);
+	 float vy = rho_dot * sin(phi);
+
+	 // measurement inputs
+	 x_ << px, py, vx, vy;
+
+      } else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
+	 /**
+	    Initialize state.
+	 */
+
+	 // measurement inputs
+	 x_ << meas_package.raw_measurements_[0], meas_package.raw_measurements_[1], 0, 0;
+      }
+
+      time_us_ = meas_package.timestamp_;
+
+      // cout << x_ << endl;
+      // done initializing, no need to predict or update
+
+
+      is_initialized_ = true;
+      return;
+   }
+   
+   float dt = (meas_package.timestamp_ - time_us_) / 1000000.0;	//dt - expressed in seconds
+   time_us_ = meas_package.timestamp_;
+
+   Prediction(dt);
+
+  if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    // Radar updates
+
+
+     // TODO
+
+
+     UpdateRadar(meas_package);
+  } else {
+    // Laser updates
+
+
+     // TODO
+
+
+     UpdateLidar(meas_package);
+  }     
+
+
+  // print the output
+  cout << "x_ = " << x_ << endl;
+  cout << "P_ = " << P_ << endl;
+
 }
 
 /**
@@ -108,7 +176,44 @@ void UKF::Prediction(double delta_t) {
 
   Complete this function! Estimate the object's location. Modify the state
   vector, x_. Predict sigma points, the state, and the state covariance matrix.
+
+
+
+
+
+
   */
+
+   // TODO
+   // Sigma Points
+
+
+
+
+
+  float dt_2     = delta_t * delta_t;
+  float dt_3     = dt_2 * delta_t;
+  float dt_4     = dt_3 * delta_t;
+  float noise_ax = 9;
+  float noise_ay = 9;
+
+  // state transition matrix
+  F_(0, 2) = delta_t;
+  F_(1, 3) = delta_t;
+
+  // process covariance matrix
+  Q_ <<
+      dt_4/4*noise_ax,               0, dt_3/2*noise_ax,               0,
+      0              , dt_4/4*noise_ay,               0, dt_3/2*noise_ay,
+      dt_3/2*noise_ax,               0,   dt_2*noise_ax,               0,
+      0              , dt_3/2*noise_ay,               0,   dt_2*noise_ay;
+
+
+
+  // Normal Kalman Filter
+  x_ = F_ * x_;
+  MatrixXd Ft = F_.transpose();
+  P_ = F_ * P_ * Ft + Q_;
 }
 
 /**
@@ -123,6 +228,31 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   position. Modify the state vector, x_, and covariance, P_.
 
   You'll also need to calculate the lidar NIS.
+
+
+
+
+
+
+
+  // VectorXd y = z - H_ * x_;
+  VectorXd z_pred = H_ * x_;
+  VectorXd y = z - z_pred;
+
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+
+  // MatrixXd K =  P_ * Ht * Si;
+  MatrixXd PHt = P_ * Ht;
+  MatrixXd K = PHt * Si;
+
+  //new state
+  x_ = x_ + (K * y);
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
+
   */
 }
 
@@ -138,5 +268,43 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   position. Modify the state vector, x_, and covariance, P_.
 
   You'll also need to calculate the radar NIS.
+
+
+
+  // Get predicted location in polar coords.
+  float px = x_(0);
+  float py = x_(1);
+  float vx = x_(2);
+  float vy = x_(3);
+
+  float rho = sqrtf(px * px + py * py);
+  float phi = atan2f(py, px);
+  float rho_dot = (px * vx + py * vy) / (rho + FLT_MIN);
+  // RMSE: 0.0973, 0.0855, 0.4513, 0.4399
+
+  // from Forum: EKF gets off track
+  // https://discussions.udacity.com/t/ekf-gets-off-track/276122
+  float diff = z(1) - phi;
+  if (6.2 < diff) {
+      phi += 2 * M_PI;
+  }
+
+  VectorXd z_pred(3);
+  z_pred << rho, phi, rho_dot; // H_ * x_;
+
+  VectorXd y = z - z_pred;
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+
+  MatrixXd PHt = P_ * Ht;
+  MatrixXd K = PHt * Si;
+
+  //new estimate
+  x_ = x_ + (K * y);
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+	P_ = (I - K * H_) * P_;
+
   */
 }
