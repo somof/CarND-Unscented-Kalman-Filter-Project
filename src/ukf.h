@@ -102,6 +102,15 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+
+   void AugmentedSigmaPoints(MatrixXd &Xsig_out);
+   void SigmaPointPrediction(const MatrixXd &Xsig_aug, const double delta_t, MatrixXd  &Xsig_out);
+   void PredictMeanAndCovariance(const MatrixXd &Xsig_pred, VectorXd & x_out, MatrixXd & P_out);
+
+   void PredictRadarMeasurement(VectorXd &z_out, MatrixXd &S_out, MatrixXd &Tc_out);
+   void PredictLidarMeasurement(VectorXd &z_out, MatrixXd &S_out, MatrixXd &Tc_out);
+
 };
 
 #endif /* UKF_H */
