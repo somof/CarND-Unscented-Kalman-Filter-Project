@@ -108,6 +108,9 @@ public:
 
   // NIS for laser
    double NIS_laser_;
+   int n_zrad_;
+   int n_zlas_;
+
 
    void AugmentedSigmaPoints(MatrixXd &Xsig_out);
    void SigmaPointPrediction(const MatrixXd &Xsig_aug, const double delta_t, MatrixXd  &Xsig_out);
